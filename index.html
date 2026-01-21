@@ -3,106 +3,126 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>DON!! Counter</title>
+<title>DON!! Deck</title>
 
 <style>
-  body {
-    margin: 0;
-    height: 100vh;
-    background: radial-gradient(circle at top, #111 0%, #000 70%);
-    color: #fff;
-    font-family: system-ui;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    text-align: center;
-  }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #111 0%, #000 70%);
+  color: #fff;
+  font-family: system-ui;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
 
-  header {
-    padding-top: 14px;
-    font-size: 26px;
-    letter-spacing: 2px;
-  }
+header {
+  padding: 14px 0 6px;
+  font-size: 26px;
+  letter-spacing: 2px;
+}
 
-  .top-info {
-    display: flex;
-    justify-content: space-around;
-    font-size: 16px;
-    opacity: 0.9;
-  }
+.top-info {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  font-size: 15px;
+  opacity: 0.9;
+}
 
-  .toggle {
-    padding: 6px 16px;
-    border-radius: 22px;
-    background: #333;
-  }
+.toggle {
+  padding: 6px 18px;
+  border-radius: 22px;
+  background: #333;
+}
 
-  .don-area {
-    display: flex;
-    justify-content: space-around;
-    padding: 18px 12px;
-  }
+.turn-button {
+  margin: 16px;
+}
 
-  .don-box {
-    width: 48%;
-    border-radius: 30px;
-    padding: 26px 10px;
-  }
+.turn-button button {
+  width: 100%;
+  height: 72px;
+  font-size: 22px;
+  border-radius: 24px;
+  border: none;
+  font-weight: bold;
+  background: #2a9d8f;
+  color: #fff;
+}
 
-  .active {
-    background: linear-gradient(180deg, #2a9d8f, #1f776c);
-    box-shadow: 0 0 40px rgba(42,157,143,0.65);
-  }
+.don-area {
+  display: flex;
+  justify-content: space-around;
+  padding: 16px 12px;
+}
 
-  .rest {
-    background: linear-gradient(180deg, #3a4a5a, #1c2630);
-    opacity: 0.9;
-  }
+.don-box {
+  width: 46%;
+  border-radius: 28px;
+  padding: 22px 10px;
+}
 
-  .count {
-    font-size: 26vw;
-    font-weight: bold;
-    line-height: 1;
-  }
+.active {
+  background: linear-gradient(180deg, #2a9d8f, #1f776c);
+  box-shadow: 0 0 36px rgba(42,157,143,0.6);
+}
 
-  .label {
-    margin-top: 6px;
-    font-size: 15px;
-    letter-spacing: 1px;
-    opacity: 0.85;
-  }
+.rest {
+  background: linear-gradient(180deg, #3a4a5a, #1c2630);
+  opacity: 0.9;
+}
 
-  .buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    padding: 18px;
-  }
+.count {
+  font-size: 24vw;
+  font-weight: bold;
+  line-height: 1;
+}
 
-  button {
-    height: 66px;
-    font-size: 18px;
-    border-radius: 18px;
-    border: none;
-    color: white;
-    font-weight: bold;
-  }
+.label {
+  margin-top: 6px;
+  font-size: 14px;
+  letter-spacing: 1px;
+  opacity: 0.85;
+}
 
-  .add { background: #e9c46a; color: #000; }
-  .minus { background: #555; }
-  .reset { background: #222; grid-column: span 2; }
+.bottom-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 16px;
+}
+
+button {
+  height: 60px;
+  font-size: 18px;
+  border-radius: 18px;
+  border: none;
+  color: white;
+  font-weight: bold;
+}
+
+.plus { background: #e9c46a; color: #000; }
+.minus { background: #555; }
+.reset { background: #222; grid-column: span 2; }
 </style>
 </head>
 
 <body>
 
 <header>
-  DON!!
+  DON!! Deck
   <div class="top-info">
-    <div>TOTAL <span id="total">0</span></div>
+    <div>TOTAL <span id="total">0</span>/10</div>
     <div class="toggle" onclick="toggleFirst()" id="turnType">先行</div>
+    <div>TURN <span id="turn">1</span></div>
   </div>
 </header>
+
+<div class="turn-button">
+  <button onclick="nextTurn()">ターン＋</button>
+</div>
 
 <div class="don-area">
   <div class="don-box active" onclick="tapActive()">
@@ -116,79 +136,83 @@
   </div>
 </div>
 
-<div class="buttons">
-  <button class="add" onclick="addDon()">ドン追加</button>
-  <button class="minus" onclick="minusTotal()">ドン戻し</button>
-  <button class="reset" onclick="resetDon()">RESET</button>
+<div class="bottom-buttons">
+  <button class="plus" onclick="addOne()">＋1ドン</button>
+  <button class="minus" onclick="minusOne()">−1ドン</button>
+  <button class="reset" onclick="resetGame()">RESET</button>
 </div>
 
 <script>
-  let total = 0;
-  let active = 0;
-  let rest = 0;
-  let first = true;
+let total = 1;
+let active = 1;
+let rest = 0;
+let first = true;
+let turn = 1;
+const MAX = 10;
 
-  function update() {
-    document.getElementById("total").textContent = total;
-    document.getElementById("active").textContent = active;
-    document.getElementById("rest").textContent = rest;
-    document.getElementById("turnType").textContent = first ? "先行" : "後攻";
-  }
+function update() {
+  document.getElementById("total").textContent = total;
+  document.getElementById("active").textContent = active;
+  document.getElementById("rest").textContent = rest;
+  document.getElementById("turnType").textContent = first ? "先行" : "後攻";
+  document.getElementById("turn").textContent = turn;
+}
 
-  function toggleFirst() {
-    if (first) {
-      if (total > 0) {
-        if (active > 0) active--;
-        else if (rest > 0) rest--;
-        total--;
-      }
-      first = false;
-    } else {
-      total++;
-      active++;
-      first = true;
-    }
-    update();
-  }
-
-  function addDon() {
-    total += 2;
-    active += 2;
-    update();
-  }
-
-  function tapActive() {
-    if (rest > 0) {
-      rest--;
-      active++;
-      update();
-    }
-  }
-
-  function tapRest() {
-    if (active > 0) {
-      active--;
-      rest++;
-      update();
-    }
-  }
-
-  function minusTotal() {
-    if (total === 0) return;
-    if (rest > 0) rest--;
-    else if (active > 0) active--;
-    total--;
-    update();
-  }
-
-  function resetDon() {
-    total = first ? 1 : 0;
-    active = total;
-    rest = 0;
-    update();
-  }
-
+function resetGame() {
+  turn = 1;
+  total = first ? 1 : 0;
+  active = total;
+  rest = 0;
   update();
+}
+
+function toggleFirst() {
+  first = !first;
+  resetGame(); // ← 切り替えた瞬間に初期化
+}
+
+function addOne() {
+  if (total >= MAX) return;
+  total++;
+  active++;
+  update();
+}
+
+function minusOne() {
+  if (total === 0) return;
+  if (rest > 0) rest--;
+  else active--;
+  total--;
+  update();
+}
+
+function tapActive() {
+  if (active > 0) {
+    active--;
+    rest++;
+    update();
+  }
+}
+
+function tapRest() {
+  if (rest > 0) {
+    rest--;
+    active++;
+    update();
+  }
+}
+
+function nextTurn() {
+  if (total < MAX) {
+    total += Math.min(2, MAX - total);
+  }
+  active = total;
+  rest = 0;
+  turn++;
+  update();
+}
+
+update();
 </script>
 
 </body>
